@@ -22,6 +22,7 @@ use craft\web\View;
 use Twig_Extension;
 use Twig_SimpleFunction;
 use Twig_SimpleFilter;
+use GuzzleHttp;
 
 /**
  * @author    Rob Erskine
@@ -48,6 +49,7 @@ class UserManualTwigExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFunction('getHelpDocument', [$this, 'getHelpDocument']),
+            new Twig_SimpleFunction('getExternalDocs', [$this, 'getExternalDocs']),
         ];
     }
 
@@ -78,7 +80,15 @@ class UserManualTwigExtension extends Twig_Extension
 
         Craft::configure($query, $criteria);
         $entry = $query->one();
-
+        // if (!$entry) {
+            $remoteQuery = $this->getExternalDocs();
+            foreach ($remoteQuery as $manual) {
+                if ($manual['slug'] == $slug) {
+                    $entry = $manual;
+                }
+            }
+            // Craft::dd($entry);
+        // }
         // If the app has not been set up at all or there are no entires,
         // redirect to the settings page
         if (!$sectionId || !$entry) {
@@ -91,7 +101,6 @@ class UserManualTwigExtension extends Twig_Extension
             } else {
                 $template = 'usermanual/_body.twig';
             }
-
             $output = Craft::$app->view->renderTemplate($template, [
                 'entry' => $entry,
             ]);
@@ -101,5 +110,16 @@ class UserManualTwigExtension extends Twig_Extension
 
             return $output;
         }
+    }
+
+    // KA addition - Mike
+
+    public function getExternalDocs()
+    {
+        $client = new GuzzleHttp\Client();
+        $res = $client->request('GET', 'http://kurious-digital.test/api/manuals/nav');
+
+        return json_decode($res->getBody(), true);
+
     }
 }
