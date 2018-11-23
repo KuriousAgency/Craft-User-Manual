@@ -124,6 +124,7 @@ class UserManual extends Plugin
     public function registerCpUrlRules(RegisterUrlRulesEvent $event)
     {
         $rules = [
+            'usermanual/remote/<userManualPath:([a-zéñåA-Z0-9\-\_\/]+)?>' => ['template' => 'usermanual/index'],
             'usermanual/<userManualPath:([a-zéñåA-Z0-9\-\_\/]+)?>' => ['template' => 'usermanual/index'],
         ];
 
