@@ -124,8 +124,23 @@ class UserManualTwigExtension extends Twig_Extension
     {
         $segments = Craft::$app->request->segments;
         $segment = end($segments);
+        if ($segment == 'usermanual') {
+            $res = $this->getExternalNav();
+
+            if (!count($res)) {
+                Craft::$app->session->setFlash('No Manuals found, please check Remote Source URL');
+                Craft::$app->controller->redirect(UrlHelper::cpUrl('settings/plugins/usermanual/'))->send();
+
+                return false;
+
+            } else {
+                $segment = $res[0]['slug'];
+            }
+            
+        }
         $url = 'doc.html?doc='.$segment;
-        $res = $this->apiCall($url);       
+        $res = $this->apiCall($url);   
+
 
         return $res->getBody();
     }
@@ -141,7 +156,8 @@ class UserManualTwigExtension extends Twig_Extension
     public function apiCall($url)
     {
         $client = new GuzzleHttp\Client();
-        $baseUrl = 'http://kurious-digital.test/api/manuals/';
+        $settings = UserManual::$plugin->getSettings();
+        $baseUrl = $settings->remoteSourceUrl;
         $res = $client->request('GET', $baseUrl.$url);
 
         return $res;
