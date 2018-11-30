@@ -11,9 +11,9 @@
  * @copyright Copyright (c) 2018 Rob Erskine
  */
 
-namespace hillholliday\usermanual\variables;
+namespace kuriousagency\usermanual\variables;
 
-use hillholliday\usermanual\UserManual;
+use kuriousagency\usermanual\UserManual;
 
 use Craft;
 

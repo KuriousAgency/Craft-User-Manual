@@ -11,9 +11,9 @@
  * @copyright Copyright (c) 2018 Rob Erskine
  */
 
-namespace hillholliday\usermanual\twigextensions;
+namespace kuriousagency\usermanual\twigextensions;
 
-use hillholliday\usermanual\UserManual;
+use kuriousagency\usermanual\UserManual;
 
 use Craft;
 use craft\elements\Entry;

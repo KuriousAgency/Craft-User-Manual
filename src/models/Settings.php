@@ -11,9 +11,9 @@
  * @copyright Copyright (c) 2018 Rob Erskine
  */
 
-namespace hillholliday\usermanual\models;
+namespace kuriousagency\usermanual\models;
 
-use hillholliday\usermanual\UserManual;
+use kuriousagency\usermanual\UserManual;
 
 use Craft;
 use craft\base\Model;
