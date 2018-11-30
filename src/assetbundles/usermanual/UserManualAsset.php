@@ -11,7 +11,7 @@
  * @copyright Copyright (c) 2018 Rob Erskine
  */
 
-namespace hillholliday\usermanual\assetbundles\UserManual;
+namespace kuriousagency\usermanual\assetbundles\UserManual;
 
 use Craft;
 use craft\web\AssetBundle;
@@ -32,7 +32,7 @@ class UserManualAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@hillholliday/usermanual/assetbundles/usermanual/dist";
+        $this->sourcePath = "@kuriousagency/usermanual/assetbundles/usermanual/dist";
 
         $this->depends = [
             CpAsset::class,
