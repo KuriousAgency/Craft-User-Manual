@@ -9,11 +9,29 @@
 
 {% set title = craft.userManual.name|t %}
 {% set sidebar %}
+{% set extraNav = getExternalNav()|raw %}
+{% set masterLoop = 1 %}
   <nav>
     {% set help = craft.entries.sectionId(sectionSelected).all() %}
     <ul>
+    {% for remote in extraNav if remote.level == 1 %}
+      {% set active = remote.slug == craft.app.request.segments|last or masterLoop == 1 and craft.app.request.segments|last == 'usermanual'%}
+        <li>
+          <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ remote.slug) }}">{{ remote.title }}</a>
+          {% if remote.hasDescendants %}
+            <ul>
+              {% for child in remote.children %}
+                {% set active = child.slug == craft.app.request.segments|last %}
+                <li>
+                  <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ child.slug) }}">{{ child.title }}</a>
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+        </li>
+      {% endfor %}
       {% nav page in help %}
-        {% set active = page.slug == craft.app.request.segments|last or loop.first and craft.app.request.segments|last == 'usermanual' %}
+        {% set active = page.slug == craft.app.request.segments|last %}
         <li>
           <a {% if active %}class="sel"{% endif %}
             href="{{ url('usermanual/' ~ page.uri) }}">
@@ -25,13 +43,17 @@
               </ul>
           {% endifchildren %}
           </li>
-      {% endnav %}
+      {% endnav %}  
     </ul>
   </nav>
 {% endset %}
 
 {% set content %}
   <div id="user-manual">
+  {% if  (craft.app.request.getSegment(2) == 'remote') or (craft.app.request.segments|last == 'usermanual') %}
+    {{ getExternalDocument(sectionSelected)|raw }}
+  {% else %}
     {{ getHelpDocument(sectionSelected)|raw }}
+  {% endif %}
   </div>
 {% endset %}

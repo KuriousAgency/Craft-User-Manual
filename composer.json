@@ -1,5 +1,5 @@
 {
-    "name": "hillholliday/craft-user-manual",
+    "name": "kuriousagency/craft-user-manual",
     "description": "Craft User Manual allows developers (or even content editors) to provide CMS documentation using Craft's built-in sections (singles, channels, or structures) to create a `User Manual` or `Help` section directly in the control panel.",
     "type": "craft-plugin",
     "version": "2.0.1",
@@ -15,18 +15,16 @@
         "issues": "https://github.com/hillholliday/Craft-User-Manual/issues"
     },
     "license": "MIT",
-    "authors": [
-        {
-            "name": "Rob Erskine",
-            "homepage": "https://twitter.com/erskinerob"
-        }
-    ],
+    "authors": [{
+        "name": "Rob Erskine",
+        "homepage": "https://twitter.com/erskinerob"
+    }],
     "require": {
         "craftcms/cms": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
-          "hillholliday\\usermanual\\": "src/"
+            "hillholliday\\usermanual\\": "src/"
         }
     },
     "extra": {

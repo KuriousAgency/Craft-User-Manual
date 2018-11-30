@@ -22,6 +22,7 @@ use craft\web\View;
 use Twig_Extension;
 use Twig_SimpleFunction;
 use Twig_SimpleFilter;
+use GuzzleHttp;
 
 /**
  * @author    Rob Erskine
@@ -48,6 +49,9 @@ class UserManualTwigExtension extends Twig_Extension
     {
         return [
             new Twig_SimpleFunction('getHelpDocument', [$this, 'getHelpDocument']),
+            new Twig_SimpleFunction('getExternalNav', [$this, 'getExternalNav']),
+            new Twig_SimpleFunction('getExternalDocument', [$this, 'getExternalDocument']),
+            new Twig_SimpleFunction('getHomepage', [$this, 'getHomepage'])
         ];
     }
 
@@ -76,8 +80,12 @@ class UserManualTwigExtension extends Twig_Extension
             'slug' => $slug,
         ];
 
+
         Craft::configure($query, $criteria);
         $entry = $query->one();
+
+        
+        // Craft::dd($sectionId);
 
         // If the app has not been set up at all or there are no entires,
         // redirect to the settings page
@@ -91,7 +99,6 @@ class UserManualTwigExtension extends Twig_Extension
             } else {
                 $template = 'usermanual/_body.twig';
             }
-
             $output = Craft::$app->view->renderTemplate($template, [
                 'entry' => $entry,
             ]);
@@ -101,5 +108,58 @@ class UserManualTwigExtension extends Twig_Extension
 
             return $output;
         }
+    }
+
+    // KA addition - Mike
+
+    public function getExternalNav()
+    {
+        $url = 'nav';
+        $res = $this->apiCall($url);
+
+        return json_decode($res->getBody(), true);
+    }
+
+    public function getExternalDocument()
+    {
+        $segments = Craft::$app->request->segments;
+        $segment = end($segments);
+        if ($segment == 'usermanual') {
+            $res = $this->getExternalNav();
+
+            if (!count($res)) {
+                Craft::$app->session->setFlash('No Manuals found, please check Remote Source URL');
+                Craft::$app->controller->redirect(UrlHelper::cpUrl('settings/plugins/usermanual/'))->send();
+
+                return false;
+
+            } else {
+                $segment = $res[0]['slug'];
+            }
+            
+        }
+        $url = 'doc.html?doc='.$segment;
+        $res = $this->apiCall($url);   
+
+
+        return $res->getBody();
+    }
+    public function getHomepage()
+    {
+        $url = 'home.html';
+        $res = $this->apiCall($url);
+
+        return $res->getBody();
+
+    }
+
+    public function apiCall($url)
+    {
+        $client = new GuzzleHttp\Client();
+        $settings = UserManual::$plugin->getSettings();
+        $baseUrl = $settings->remoteSourceUrl;
+        $res = $client->request('GET', $baseUrl.$url);
+
+        return $res;
     }
 }

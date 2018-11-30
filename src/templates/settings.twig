@@ -71,3 +71,10 @@ Path is relative to <code>{{ siteTemplatesPath }}</code>.
     disabled: configOverride,
     readonly: configOverride,
 })}}
+
+{{ forms.textField({
+    label: "Remote Source URL",
+    id: "remoteSourceUrl",
+    name: "remoteSourceUrl",
+    value: settings.remoteSourceUrl,
+})}}

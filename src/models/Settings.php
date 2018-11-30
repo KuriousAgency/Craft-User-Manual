@@ -43,6 +43,12 @@ class Settings extends Model
      */
     public $section;
 
+    /**
+     * 
+     * @var string
+     */
+    public $remoteSourceUrl;
+
     // Public Methods
     // =========================================================================
 
@@ -52,7 +58,7 @@ class Settings extends Model
     public function rules()
     {
         return [
-            [['pluginNameOverride', 'templateOverride'], 'string'],
+            [['pluginNameOverride', 'templateOverride', 'remoteSourceUrl'], 'string'],
             ['section', 'number'],
         ];
     }
