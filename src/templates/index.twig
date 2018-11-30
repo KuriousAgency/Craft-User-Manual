@@ -16,13 +16,13 @@
     {% set help = craft.entries.sectionId(sectionSelected).all() %}
     <ul>
     {% for remote in extraNav if remote.level == 1 %}
-      {% set active = remote.uri == craft.app.request.segments[-2:] or masterLoop == 1 and craft.app.request.segments|last == 'usermanual'%}
+      {% set active = 'remote/'~remote.slug == craft.app.request.segments[-2:]|join("/") or craft.app.request.segments|last == 'usermanual'%}
         <li>
           <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ remote.slug) }}">{{ remote.title }}</a>
           {% if remote.hasDescendants %}
             <ul>
               {% for child in remote.children %}
-                {% set active = child.slug == craft.app.request.segments|last %}
+                {% set active = 'remote/'~child.slug == craft.app.request.segments[-2:]|join("/") %}
                 <li>
                   <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ child.slug) }}">{{ child.title }}</a>
                 </li>
@@ -32,7 +32,7 @@
         </li>
       {% endfor %}
       {% nav page in help %}
-        {% set active = page.uri == craft.app.request.segments[-2:] %}
+        {% set active = page.uri == craft.app.request.segments[-2:]|join("/") %}
         <li>
           <a {% if active %}class="sel"{% endif %}
             href="{{ url('usermanual/' ~ page.uri) }}">
