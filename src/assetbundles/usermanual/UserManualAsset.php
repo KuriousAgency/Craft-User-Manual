@@ -32,7 +32,7 @@ class UserManualAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@hillholliday/usermanual/assetbundles/usermanual/dist";
+        $this->sourcePath = "@kuriousagency/usermanual/assetbundles/usermanual/dist";
 
         $this->depends = [
             CpAsset::class,
