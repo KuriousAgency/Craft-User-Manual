@@ -2,7 +2,7 @@
     "name": "kuriousagency/craft-user-manual",
     "description": "Craft User Manual allows developers (or even content editors) to provide CMS documentation using Craft's built-in sections (singles, channels, or structures) to create a `User Manual` or `Help` section directly in the control panel.",
     "type": "craft-plugin",
-    "version": "2.0.1",
+    "version": "v2.0.2",
     "keywords": [
         "craft",
         "cms",
@@ -10,21 +10,18 @@
         "craft-plugin",
         "usermanual"
     ],
-    "support": {
-        "docs": "https://github.com/hillholliday/Craft-User-Manual/blob/master/README.md",
-        "issues": "https://github.com/hillholliday/Craft-User-Manual/issues"
-    },
+
     "license": "MIT",
     "authors": [{
-        "name": "Rob Erskine",
-        "homepage": "https://twitter.com/erskinerob"
+        "name": "Kurious Agency",
+        "homepage": "https://kurious.agency"
     }],
     "require": {
         "craftcms/cms": "^3.0.0"
     },
     "autoload": {
         "psr-4": {
-            "hillholliday\\usermanual\\": "src/"
+            "kuriousagency\\usermanual\\": "src/"
         }
     },
     "extra": {
@@ -32,7 +29,7 @@
         "handle": "usermanual",
         "hasCpSettings": true,
         "hasCpSection": true,
-        "changelogUrl": "https://raw.githubusercontent.com/hillholliday/Craft-User-Manual/master/CHANGELOG.md",
-        "class": "hillholliday\\usermanual\\UserManual"
+        "changelogUrl": "https://raw.githubusercontent.com/KuriousAgency/craft-user-manual/craft-user-manual/master/CHANGELOG.md",
+        "class": "kuriousagency\\usermanual\\UserManual"
     }
 }
