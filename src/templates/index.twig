@@ -11,11 +11,12 @@
 {% set sidebar %}
 {% set extraNav = getExternalNav()|raw %}
 {% set masterLoop = 1 %}
+{% set active = false %}
   <nav>
     {% set help = craft.entries.sectionId(sectionSelected).all() %}
     <ul>
     {% for remote in extraNav if remote.level == 1 %}
-      {% set active = remote.slug == craft.app.request.segments|last or masterLoop == 1 and craft.app.request.segments|last == 'usermanual'%}
+      {% set active = remote.uri == craft.app.request.segments[-2:] or masterLoop == 1 and craft.app.request.segments|last == 'usermanual'%}
         <li>
           <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ remote.slug) }}">{{ remote.title }}</a>
           {% if remote.hasDescendants %}
@@ -31,7 +32,7 @@
         </li>
       {% endfor %}
       {% nav page in help %}
-        {% set active = page.slug == craft.app.request.segments|last %}
+        {% set active = page.uri == craft.app.request.segments[-2:] %}
         <li>
           <a {% if active %}class="sel"{% endif %}
             href="{{ url('usermanual/' ~ page.uri) }}">
