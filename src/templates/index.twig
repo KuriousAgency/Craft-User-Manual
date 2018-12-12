@@ -10,10 +10,16 @@
 {% set title = craft.userManual.name|t %}
 {% set sidebar %}
 {% set extraNav = getExternalNav()|raw %}
+
+{# {% if extraNav == false %}{% redirect '/admin/settings/plugins/usermanual' %}{% endif %} #}
 {% set masterLoop = 1 %}
 {% set active = false %}
   <nav>
-    {% set help = craft.entries.sectionId(sectionSelected).all() %}
+    {% if sectionSelected == null %}
+      {% set help = null %}
+    {% else %}
+      {% set help = craft.entries.sectionId(sectionSelected).all() %}
+    {% endif %}
     <ul>
     {% for remote in extraNav if remote.level == 1 %}
       {% set active = 'remote/'~remote.slug == craft.app.request.segments[-2:]|join("/") or craft.app.request.segments|last == 'usermanual'%}

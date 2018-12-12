@@ -23,6 +23,7 @@ use Twig_Extension;
 use Twig_SimpleFunction;
 use Twig_SimpleFilter;
 use GuzzleHttp;
+use GuzzleHttp\Exception\RequestException;
 
 /**
  * @author    Rob Erskine
@@ -116,8 +117,14 @@ class UserManualTwigExtension extends Twig_Extension
     {
         $url = 'nav';
         $res = $this->apiCall($url);
-
-        return json_decode($res->getBody(), true);
+        if ($res) {
+            return json_decode($res->getBody(), true);
+        } else {
+            Craft::$app->session->setError('No Manuals found, please check Remote and Local');
+            Craft::$app->controller->redirect(UrlHelper::cpUrl('settings/plugins/usermanual/'))->send();
+            return false;
+        }
+        
     }
 
     public function getExternalDocument()
@@ -127,8 +134,8 @@ class UserManualTwigExtension extends Twig_Extension
         if ($segment == 'usermanual') {
             $res = $this->getExternalNav();
 
-            if (!count($res)) {
-                Craft::$app->session->setFlash('No Manuals found, please check Remote Source URL');
+            if (!$res) {
+                Craft::$app->session->setError('No Manuals found, please check Remote Source URL');
                 Craft::$app->controller->redirect(UrlHelper::cpUrl('settings/plugins/usermanual/'))->send();
 
                 return false;
@@ -144,22 +151,28 @@ class UserManualTwigExtension extends Twig_Extension
 
         return $res->getBody();
     }
-    public function getHomepage()
-    {
-        $url = 'home.html';
-        $res = $this->apiCall($url);
+    // public function getHomepage()
+    // {
+    //     $url = 'home.html';
+    //     $res = $this->apiCall($url);
 
-        return $res->getBody();
+    //     return $res->getBody();
 
-    }
+    // }
 
     public function apiCall($url)
     {
         $client = new GuzzleHttp\Client();
         $settings = UserManual::$plugin->getSettings();
         $baseUrl = $settings->remoteSourceUrl;
-        $res = $client->request('GET', $baseUrl.$url);
 
-        return $res;
+        //$res = $client->request('GET', $baseUrl.$url);
+        try {
+            return $client->request('GET', $baseUrl.$url);
+        } catch (RequestException $e) {
+            if ($e->hasResponse()) {
+                return false;
+            }
+        }
     }
 }

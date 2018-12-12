@@ -157,9 +157,10 @@ class UserManual extends Plugin
     protected function settingsHtml(): string
     {
         $options = [[
-            'label' => '',
+            'label' => 'Not Required',
             'value' => '',
         ]];
+
         foreach (Craft::$app->sections->getAllSections() as $section) {
             $siteSettings = Craft::$app->sections->getSectionSiteSettings($section['id']);
             $hasUrls = false;
@@ -168,16 +169,15 @@ class UserManual extends Plugin
                     $hasUrls = true;
                 }
             }
-
-            if (!$hasUrls) {
+            // Allows backend only manuals
+            /*if (!$hasUrls) {
                 continue;
-            }
+            }*/
             $options[] = [
                 'label' => $section['name'],
                 'value' => $section['id'],
             ];
         }
-
         // Get override settings from config file.
         $overrides = Craft::$app->getConfig()->getConfigFromFile(strtolower($this->handle));
 
@@ -212,12 +212,14 @@ class UserManual extends Plugin
 
         // Allow handles from config
         if (!is_numeric($settings->section)) {
-            $section = Craft::$app->getSections()->getSectionByHandle('homepage');
+            // Allows the plugin to have no local manuals
+
+            /* $section = Craft::$app->getSections()->getSectionByHandle('homepage');
+       
             if ($section) {
                 $settings->section = $section->id;
-            }
+            }*/
         }
-
         return $settings;
     }
 
