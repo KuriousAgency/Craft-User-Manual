@@ -38,10 +38,10 @@
         </li>
       {% endfor %}
       {% nav page in help %}
-        {% set active = page.uri == craft.app.request.segments[-2:]|join("/") %}
+        {% set active = 'local/'~page.slug == craft.app.request.segments[-2:]|join("/") %}
         <li>
           <a {% if active %}class="sel"{% endif %}
-            href="{{ url('usermanual/' ~ page.uri) }}">
+            href="{{ url('usermanual/local/' ~ page.slug) }}">
             {{page.title}}
           </a>
           {% ifchildren %}
