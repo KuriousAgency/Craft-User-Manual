@@ -43,7 +43,8 @@ class UserManualAsset extends AssetBundle
         ];
 
         $this->css = [
-            'css/UserManual.css',
+			'css/twbs.css',
+			'css/UserManual.css',
         ];
 
         parent::init();
