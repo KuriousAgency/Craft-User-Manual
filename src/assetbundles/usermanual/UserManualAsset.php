@@ -11,7 +11,7 @@
  * @copyright Copyright (c) 2018 Rob Erskine
  */
 
-namespace kuriousagency\usermanual\assetbundles\UserManual;
+namespace kuriousagency\usermanual\assetbundles\usermanual;
 
 use Craft;
 use craft\web\AssetBundle;
@@ -32,20 +32,14 @@ class UserManualAsset extends AssetBundle
      */
     public function init()
     {
-        $this->sourcePath = "@kuriousagency/usermanual/assetbundles/usermanual/dist";
+        $this->sourcePath =
+            "@kuriousagency/usermanual/assetbundles/usermanual/dist";
 
-        $this->depends = [
-            CpAsset::class,
-        ];
+        $this->depends = [CpAsset::class];
 
-        $this->js = [
-            'js/UserManual.js',
-        ];
+        $this->js = ['js/UserManual.js'];
 
-        $this->css = [
-			'css/twbs.css',
-			'css/UserManual.css',
-        ];
+        $this->css = ['css/twbs.css', 'css/UserManual.css'];
 
         parent::init();
     }
