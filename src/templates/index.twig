@@ -3,67 +3,35 @@
 
 {% do view.registerAssetBundle("kuriousagency\\usermanual\\assetbundles\\usermanual\\UserManualAsset") %}
 
-{% set sectionSelected = (craft.userManual.settings.section is defined)
-  ? craft.userManual.settings.section
-  : "Homepage" %}
-
-{% set title = craft.userManual.name|t %}
-{% set sidebar %}
-{% set extraNav = getExternalNav()|raw %}
 {% set bodyClass = (bodyClass is defined ? bodyClass~' ' : '') ~ "user-manual" %}
+{% set title = craft.userManual.name|t %}
 
-{# {% if extraNav == false %}{% redirect '/admin/settings/plugins/usermanual' %}{% endif %} #}
-{% set masterLoop = 1 %}
-{% set active = false %}
-  <nav>
-    {% if sectionSelected == null %}
-      {% set help = null %}
-    {% else %}
-      {% set help = craft.entries.sectionId(sectionSelected).all() %}
-    {% endif %}
-    <ul>
-    {% for remote in extraNav if remote.level == 1 %}
-      {% set active = 'remote/'~remote.uri == craft.app.request.segments[-2:]|join("/") or (craft.app.request.segments|last == 'usermanual' and loop.index == 1)%}
-        <li>
-          <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ remote.uri) }}">{{ remote.title }}</a>
-          {% if remote.hasDescendants %}
-            <ul>
-              {% for child in remote.children %}
-                {% set active = 'remote/'~child.uri == craft.app.request.segments[-2:]|join("/") %}
-                <li>
-                  <a {% if active %}class="sel"{% endif %} href="{{ url('usermanual/remote/' ~ child.uri) }}">{{ child.title }}</a>
-                </li>
-              {% endfor %}
-            </ul>
-          {% endif %}
-        </li>
-      {% endfor %}
-      {% nav page in help %}
-        {% set active = 'local/'~page.uri == craft.app.request.segments[-2:]|join("/") %}
-        <li>
-          <a {% if active %}class="sel"{% endif %}
-            href="{{ url('usermanual/local/' ~ page.uri) }}">
-            {{page.title}}
-          </a>
-          {% ifchildren %}
-              <ul>
-                  {% children %}
-              </ul>
-          {% endifchildren %}
-          </li>
-      {% endnav %}
-    </ul>
-  </nav>
-{% endset %}
+{% block sidebar %}
+	{% set currentPage = craft.app.request.absoluteUrl %}
+	<nav>
+		<ul>
+			{% for page in craft.userManual.getNavBar() %}
+				<li>
+					<a href="{{ page.link }}" class="{{ (page.link == currentPage) ? 'sel' : '' }}">{{ page.title }}</a>
+					{% if page.hasDescendants %}
+						<ul>
+							{% for child in page.children %}
+								<li>
+									<a href="{{ child.link }}" class="{{ (child.link == currentPage) ? 'sel' : '' }}">{{ child.title }}</a>
+								</li>
+							{% endfor %}
+						</ul>
+					{% endif %}
+				</li>
+			{% endfor %}
+		</ul>
+	</nav>
+{% endblock %}
 
-{% set content %}
-  <div id="user-manual" class="twbs">
-  <div class="container">
-  {% if  (craft.app.request.getSegment(2) == 'remote') or (craft.app.request.segments|last == 'usermanual') %}
-    {{ getExternalDocument(sectionSelected)|raw }}
-  {% else %}
-    {{ getHelpDocument(sectionSelected)|raw }}
-  {% endif %}
-  </div>
-  </div>
-{% endset %}
+{% block content %}
+	<div class="twbs" id="user-manual">
+		<div class="container">
+			{{ craft.userManual.getHelpDocument()|raw }}
+		</div>
+	</div>
+{% endblock %}

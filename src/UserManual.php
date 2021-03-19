@@ -14,8 +14,8 @@
 namespace kuriousagency\usermanual;
 
 use kuriousagency\usermanual\variables\UserManualVariable;
-use kuriousagency\usermanual\twigextensions\UserManualTwigExtension;
 use kuriousagency\usermanual\models\Settings;
+use kuriousagency\usermanual\services\UserManualService;
 
 use Craft;
 use craft\base\Plugin;
@@ -65,10 +65,11 @@ class UserManual extends Plugin
         parent::init();
         self::$plugin = $this;
 
-        $this->name = $this->getName();
+        $this->setComponents([
+            'service' => UserManualService::class,
+        ]);
 
-        // Register twig extensions
-        $this->_addTwigExtensions();
+        $this->name = $this->getName();
 
         // Register CP routes
         Event::on(
@@ -162,17 +163,6 @@ class UserManual extends Plugin
         ]];
 
         foreach (Craft::$app->sections->getAllSections() as $section) {
-            $siteSettings = Craft::$app->sections->getSectionSiteSettings($section['id']);
-            $hasUrls = false;
-            foreach ($siteSettings as $siteSetting) {
-                if ($siteSetting->hasUrls) {
-                    $hasUrls = true;
-                }
-            }
-            // Allows backend only manuals
-            /*if (!$hasUrls) {
-                continue;
-            }*/
             $options[] = [
                 'label' => $section['name'],
                 'value' => $section['id'],
@@ -209,25 +199,7 @@ class UserManual extends Plugin
             }
             $settings->$settingName = $settingValueOverride ?? $settingValue;
         }
-
-        // Allow handles from config
-        if (!is_numeric($settings->section)) {
-            // Allows the plugin to have no local manuals
-
-            /* $section = Craft::$app->getSections()->getSectionByHandle('homepage');
-       
-            if ($section) {
-                $settings->section = $section->id;
-            }*/
-        }
         return $settings;
     }
 
-    // Private Methods
-    // =========================================================================
-
-    private function _addTwigExtensions()
-    {
-        Craft::$app->view->registerTwigExtension(new UserManualTwigExtension);
-    }
 }

@@ -40,4 +40,14 @@ class UserManualVariable
 
         return $settings;
     }
+
+    public function getNavBar()
+    {
+        return UserManual::$plugin->service->getNavBar();
+    }
+
+    public function getHelpDocument()
+    {
+        return UserManual::$plugin->service->getHelpDocument();
+    }
 }
