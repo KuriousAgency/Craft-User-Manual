@@ -29,16 +29,12 @@ class UserManualVariable
 
     public function getName()
     {
-        $name = UserManual::$plugin->getName();
-
-        return $name;
+        return UserManual::$plugin->getName();
     }
 
     public function getSettings()
     {
-        $settings = UserManual::$plugin->getSettings();
-
-        return $settings;
+        return UserManual::$plugin->getSettings();
     }
 
     public function getNavBar()

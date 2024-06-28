@@ -37,7 +37,7 @@ class UserManualService extends Component
     // Public Methods
     // =========================================================================
 
-    public function init()
+    public function init(): void
     {
         $this->_settings = UserManual::$plugin->getSettings();
         if (!$this->_settings->section) {
@@ -45,17 +45,19 @@ class UserManualService extends Component
         }
     }
 
-    public function getNavBar()
+    /**
+     * @return mixed[]
+     */
+    public function getNavBar(): array
     {
         // Get the external items first
         if ($this->_settings->remoteSourceUrl) {
             $remote = $this->_getRemoteNav();
         }
+
         // Get the local items
         $local = $this->_getLocalNav();
-
-        $nav = array_merge($remote ?? [],$local);
-        return $nav;
+        return array_merge($remote ?? [],$local);
     }
 
     public function getHelpDocument()
@@ -89,11 +91,15 @@ class UserManualService extends Component
             $template = 'usermanual/_body.twig';
             $mode = View::TEMPLATE_MODE_CP;
         }
+
         return Craft::$app->getView()->renderTemplate($template,['entry' => $entry],$mode);
 
     }
 
-    private function _getLocalNav()
+    /**
+     * @return array<mixed, array<'children'|'hasDescendants'|'level'|'link'|'slug'|'title'|'uri', mixed>>
+     */
+    private function _getLocalNav(): array
     {
         $query = Entry::find()
             ->sectionId($this->_settings->section)
@@ -115,6 +121,7 @@ class UserManualService extends Component
                     'link' => UrlHelper::cpUrl('usermanual/local/' . ($child->uri ?? $child->slug))
                 ];
             }
+
             $entries[] = [
                 'title' => $entry->title,
                 'uri' => $entry->uri,
@@ -129,14 +136,14 @@ class UserManualService extends Component
         return $entries;
     }
 
-    private function _getRemoteDocument($segment)
+    private function _getRemoteDocument(string $segment)
     {
         $url = 'doc.html?doc=' . $segment;
         $response = $this->_apiCall($url);
         try {
             $response = $this->_apiCall($url);
             return $response->getBody();
-        } catch (\Throwable $th) {
+        } catch (\Throwable) {
             Craft::$app->session->setError('Could not retrieve remote document please contat administrator.');
             return 'Could not retrieve remote document please contat administrator.';
         }
@@ -147,13 +154,14 @@ class UserManualService extends Component
         $url = 'nav';
         $response = $this->_apiCall($url);
         if ($response) {
-            $nav = json_decode($response->getBody(), true);
+            $nav = json_decode($response->getBody(), true, 512, JSON_THROW_ON_ERROR);
             foreach ($nav as $key => $value) {
                 $nav[$key]['link'] = UrlHelper::cpUrl('usermanual/remote/' . $value['uri']);
                 foreach ($nav[$key]['children'] as $k => $child) {
                     $nav[$key]['children'][$k]['link'] = UrlHelper::cpUrl('usermanual/remote/' . $child['uri']);
                 }
             }
+
             return $nav;
         } else {
             Craft::$app->session->setError('No Manuals found, please check Remote and Local');
@@ -162,15 +170,15 @@ class UserManualService extends Component
         
     }
 
-    private function _apiCall($url)
+    private function _apiCall(string $url)
     {
         $client = new GuzzleHttp\Client();
         $baseUrl = $this->_settings->remoteSourceUrl;
 
         try {
             return $client->request('GET', $baseUrl.$url);
-        } catch (RequestException $e) {
-            if ($e->hasResponse()) {
+        } catch (RequestException $requestException) {
+            if ($requestException->hasResponse()) {
                 return false;
             }
         }

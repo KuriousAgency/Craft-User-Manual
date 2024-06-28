@@ -48,11 +48,7 @@ class UserManual extends Plugin
 
     // Public Properties
     // =========================================================================
-
-    /**
-     * @var string
-     */
-    public $schemaVersion = '2.0.0';
+    public string $schemaVersion = '3.0.0';
 
     // Public Methods
     // =========================================================================
@@ -60,7 +56,7 @@ class UserManual extends Plugin
     /**
      * @inheritdoc
      */
-    public function init()
+    public function init(): void
     {
         parent::init();
         self::$plugin = $this;
@@ -75,14 +71,14 @@ class UserManual extends Plugin
         Event::on(
             UrlManager::class,
             UrlManager::EVENT_REGISTER_CP_URL_RULES,
-            [$this, 'registerCpUrlRules']
+            fn(\craft\events\RegisterUrlRulesEvent $event) => $this->registerCpUrlRules($event)
         );
 
         // Register variables
         Event::on(
             CraftVariable::class,
             CraftVariable::EVENT_INIT,
-            function (Event $event) {
+            static function (Event $event) : void {
                 /** @var CraftVariable $variable */
                 $variable = $event->sender;
                 $variable->set('userManual', UserManualVariable::class);
@@ -93,7 +89,7 @@ class UserManual extends Plugin
         Event::on(
             Plugins::class,
             Plugins::EVENT_AFTER_INSTALL_PLUGIN,
-            [$this, 'afterInstallPlugin']
+            fn(\craft\events\PluginEvent $event) => $this->afterInstallPlugin($event)
         );
 
         Craft::info(
@@ -117,12 +113,10 @@ class UserManual extends Plugin
         $pluginName = Craft::t('usermanual', 'User Manual');
         $pluginNameOverride = $this->getSettings()->pluginNameOverride;
 
-        return ($pluginNameOverride)
-            ? $pluginNameOverride
-            : $pluginName;
+        return $pluginNameOverride ?: $pluginName;
     }
 
-    public function registerCpUrlRules(RegisterUrlRulesEvent $event)
+    public function registerCpUrlRules(RegisterUrlRulesEvent $event): void
     {
         $rules = [
             'usermanual/remote/<userManualPath:([a-zéñåA-Z0-9\-\_\/]+)?>' => ['template' => 'usermanual/index'],
@@ -132,7 +126,7 @@ class UserManual extends Plugin
         $event->rules = array_merge($event->rules, $rules);
     }
 
-    public function afterInstallPlugin(PluginEvent $event)
+    public function afterInstallPlugin(PluginEvent $event): void
     {
         $isCpRequest = Craft::$app->getRequest()->isCpRequest;
 
@@ -147,7 +141,7 @@ class UserManual extends Plugin
     /**
      * @inheritdoc
      */
-    protected function createSettingsModel()
+    protected function createSettingsModel(): ?\craft\base\Model
     {
         return new Settings();
     }
@@ -162,12 +156,16 @@ class UserManual extends Plugin
             'value' => '',
         ]];
 
+        $allSections = Craft::$app->sections->getAllSections();
+        Craft::dd($allSections);
+
         foreach (Craft::$app->sections->getAllSections() as $section) {
             $options[] = [
                 'label' => $section['name'],
                 'value' => $section['id'],
             ];
         }
+
         // Get override settings from config file.
         $overrides = Craft::$app->getConfig()->getConfigFromFile(strtolower($this->handle));
 
@@ -185,20 +183,17 @@ class UserManual extends Plugin
     /**
      * @inheritdoc
      */
-    public function getSettings()
+    public function getSettings(): ?\craft\base\Model
     {
         $settings = parent::getSettings();
         $config = Craft::$app->config->getConfigFromFile('usermanual');
 
         foreach ($settings as $settingName => $settingValue) {
             $settingValueOverride = null;
-            foreach ($config as $configName => $configValue) {
-                if ($configName === $settingName) {
-                    $settingValueOverride = $configValue;
-                }
-            }
+            $settingValueOverride = $config[$settingName] ?? $settingValueOverride;
             $settings->$settingName = $settingValueOverride ?? $settingValue;
         }
+
         return $settings;
     }
 
